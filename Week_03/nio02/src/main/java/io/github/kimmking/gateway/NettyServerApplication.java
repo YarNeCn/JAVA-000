@@ -9,6 +9,7 @@ public class NettyServerApplication {
     public final static String GATEWAY_VERSION = "1.0.0";
     
     public static void main(String[] args) {
+        //"http://localhost:8088,http://localhost:8089" 可以以这种方式增加多个路由地址
         String proxyServer = System.getProperty("proxyServer","http://localhost:8088");
         String proxyPort = System.getProperty("proxyPort","8888");
         

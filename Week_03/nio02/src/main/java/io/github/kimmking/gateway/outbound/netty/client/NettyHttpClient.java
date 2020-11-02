@@ -7,12 +7,13 @@ import io.netty.channel.epoll.EpollChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpRequestEncoder;
-import io.netty.handler.codec.http.HttpResponseDecoder;
+import io.netty.handler.codec.http.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+
+import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
+import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 /**
  * Netty客户端
@@ -41,8 +42,8 @@ public class NettyHttpClient implements HttpClient {
                     .option(ChannelOption.SO_SNDBUF, 32 * 1024)
                     .option(EpollChannelOption.SO_REUSEPORT, true)
                     .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
-
-
+            //客户端超时处理
+            b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000);
             b.channel(NioSocketChannel.class);
             b.option(ChannelOption.SO_KEEPALIVE, true);
             b.handler(new ChannelInitializer<SocketChannel>() {
@@ -59,7 +60,21 @@ public class NettyHttpClient implements HttpClient {
             });
 
             // Start the client.
-            ChannelFuture f = b.connect(host, port).sync();
+            ChannelFuture f = b.connect(host, port).addListener(new ChannelFutureListener() {
+                /**
+                 * 添加netty客户端超时之后，服务端的处理
+                 * @param channelFuture
+                 * @throws Exception
+                 */
+                @Override
+                public void operationComplete(ChannelFuture channelFuture) throws Exception {
+                    if(!channelFuture.isSuccess()){
+                        FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, NO_CONTENT);
+                        serverResponseChannelHandlerContext.write(response);
+                        serverResponseChannelHandlerContext.flush();
+                    }
+                }
+            }).sync();
             f.channel().write(msg);
             f.channel().flush();
             f.channel().closeFuture().sync();
