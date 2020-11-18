@@ -1,5 +1,7 @@
 package com.geek.demo;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.LockSupport;
@@ -251,15 +253,6 @@ public class ThreadCallBackDemo {
     }
 
     public static void main(String[] args) {
-        countDownLatch();
-        join();
-        cyclicBarrier();
-        future();
-        futureTask();
-        completableFuture();
-        lockSupport();
-        currentThread();
-        circuit();
-        semaphore();
+       ConcurrentHashMap<String, String> hashMap=new ConcurrentHashMap<String, String>();
     }
 }

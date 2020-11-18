@@ -11,6 +11,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * @description: Bean装配
  * @author: yarne
  * @create: 2020-11-16 16:31
+ *
  **/
 @Configuration
 public class BeanAssembleTest{
